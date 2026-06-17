@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,7 +68,6 @@ static void MX_I2C2_Init(void);
  * @retval int
  */
 int main(void) {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -99,10 +99,24 @@ int main(void) {
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int SYS_WRITEC = 0x03;
+  int SYS_WRITE0 = 0x04;
   while (1) {
-    /* USER CODE END WHILE */
+    char outchar = '!';
+    asm volatile("mov r0, %0\n\t"
+                 "mov r1, %1\n\t"
+                 "bkpt 0xab"
+                 :
+                 : "r"(SYS_WRITEC), "r"(&outchar)
+                 : "r0", "r1", "memory");
 
-    /* USER CODE BEGIN 3 */
+    static const char msg[] = "Print this to my jtag debugger\n";
+    asm volatile("mov r0, %0\n\t"
+                 "mov r1, %1\n\t"
+                 "bkpt 0xab"
+                 :
+                 : "r"(SYS_WRITE0), "r"(msg)
+                 : "r0", "r1", "memory");
   }
   /* USER CODE END 3 */
 }
