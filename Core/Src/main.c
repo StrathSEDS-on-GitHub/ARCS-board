@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -60,7 +59,26 @@ static void MX_I2C2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+// From https://sushihangover.github.io/arm-cortex-m-semihosting-with-qemu/
+const int SYS_WRITEC = 0x03;
+void printChar(char c) {
+  asm volatile("mov r0, %0\n\t"
+               "mov r1, %1\n\t"
+               "bkpt 0xab"
+               :
+               : "r"(SYS_WRITEC), "r"(&c)
+               : "r0", "r1", "memory");
+}
 
+const int SYS_WRITE0 = 0x04;
+void printStr(char *str) {
+  asm volatile("mov r0, %0\n\t"
+               "mov r1, %1\n\t"
+               "bkpt 0xab"
+               :
+               : "r"(SYS_WRITE0), "r"(str)
+               : "r0", "r1", "memory");
+}
 /* USER CODE END 0 */
 
 /**
@@ -99,25 +117,16 @@ int main(void) {
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int SYS_WRITEC = 0x03;
-  int SYS_WRITE0 = 0x04;
+  int n = 0;
+  char str[20];
   while (1) {
-    char outchar = '!';
-    asm volatile("mov r0, %0\n\t"
-                 "mov r1, %1\n\t"
-                 "bkpt 0xab"
-                 :
-                 : "r"(SYS_WRITEC), "r"(&outchar)
-                 : "r0", "r1", "memory");
+    /* USER CODE END WHILE */
+    sprintf(str, "Hello World %d\n", n++);
+    printStr(str);
 
-    static const char msg[] = "Print this to my jtag debugger\n";
-    asm volatile("mov r0, %0\n\t"
-                 "mov r1, %1\n\t"
-                 "bkpt 0xab"
-                 :
-                 : "r"(SYS_WRITE0), "r"(msg)
-                 : "r0", "r1", "memory");
+    /* USER CODE BEGIN 3 */
   }
+
   /* USER CODE END 3 */
 }
 
@@ -286,6 +295,7 @@ void Error_Handler(void) {
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1) {
+    printStr("Error_Handler: An error has occurred!\n");
   }
   /* USER CODE END Error_Handler_Debug */
 }
@@ -299,6 +309,9 @@ void Error_Handler(void) {
  */
 void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE BEGIN 6 */
+  char str[100];
+  sprintf(str, "Wrong parameters value: file %s on line %d\r\n", file, line);
+  printStr(str);
   /* User can add his own implementation to report the file name and line
      number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
      line) */
