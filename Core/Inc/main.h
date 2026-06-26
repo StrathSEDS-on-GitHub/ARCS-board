@@ -65,10 +65,6 @@ void Error_Handler(void);
 #define CURRENT_I2C2_SCL_GPIO_Port GPIOB
 #define CURRENT_I2C2_SDA_Pin GPIO_PIN_11
 #define CURRENT_I2C2_SDA_GPIO_Port GPIOB
-#define ARCS_ON_Pin GPIO_PIN_13
-#define ARCS_ON_GPIO_Port GPIOB
-#define Power_Adjust_Pin GPIO_PIN_15
-#define Power_Adjust_GPIO_Port GPIOB
 #define DAC_I2C1_SCL_Pin GPIO_PIN_9
 #define DAC_I2C1_SCL_GPIO_Port GPIOA
 #define DAC_I2C1_SDA_Pin GPIO_PIN_10
