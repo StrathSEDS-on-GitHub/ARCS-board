@@ -139,13 +139,42 @@ int main(void) {
     }
   }
   printStr("Done scanning.\n");
+  // Scanning i2c1...
+  // 0: ok
+  // 97: ok
+  // Scanning i2c2...
+  // 0: ok
+  // 64: ok
+
+  uint8_t data[0];
+  uint8_t buf[5];
+
+  HAL_I2C_Master_Transmit(&hi2c1, 0b11000011, data, 0, 100);
+
+  HAL_I2C_Master_Receive(&hi2c1, 0b11000011, buf, 5, 100);
+
+  char str[16];
+  sprintf(str, "Recv: %d %d %d %d %d\n", buf[0], buf[1], buf[2], buf[3], buf[4]);
+  printStr(str);
+  // Recv: 192 128 0 8 0
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint8_t data2[3] = {0b01000000, 0x00, 0x00};
+
   while (1) {
     /* USER CODE END WHILE */
+    for (int v = 0; v < 4096; v += 4) {
+      // data format: bit 0: don't touch, bit 1: higher 8 bits of v, bit 2: lower 4 bits of v left
+      // padded
+      data2[1] = (v >> 4) & 0xFF;
+      data2[2] = (v & 0x0F) << 4;
+
+      HAL_I2C_Master_Transmit(&hi2c1, 0b11000010, data2, 3, 100);
+      HAL_Delay(10);
+    }
 
     /* USER CODE BEGIN 3 */
   }
